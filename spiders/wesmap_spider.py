@@ -1,5 +1,5 @@
 # export as JSON:
-# $ scrapy crawl wesmap -o wesmap.json
+# $ scrapy crawl cs -o cs.json
 
 import scrapy
 from scrapy.crawler import CrawlerProcess

@@ -13,7 +13,7 @@ function dedup(arr) {
 for (var key in wesmap_JSON) {
   if (wesmap_JSON.hasOwnProperty(key)) {
     var major_JSON = wesmap_JSON[key]
-    var major = document.querySelector("#".concat( Object.keys(major_JSON)[0]));
+    var major = document.querySelector("#".concat(Object.keys(major_JSON)[0]));
     console.log(major_JSON)
     var deduped = [];
     $.each(major_JSON[Object.keys(major_JSON)[0]], function(i, el){
