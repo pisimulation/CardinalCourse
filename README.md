@@ -1,6 +1,6 @@
 # CardinalCourse
 
-Wesleyan course review site for Wesleyan students to post a rating and review of courses they took
+Wesleyan course review site for Wesleyan students to post ratings and reviews of courses they took
 
 ## Status
 I am reviving a hackathon project from the WesHack 2015. This project is still incomplete. I am currently working on the front end.
@@ -9,7 +9,8 @@ I am reviving a hackathon project from the WesHack 2015. This project is still i
 
 ### Python, Scrapy web crawling framework
 
-Course names are scraped from [WesMaps 2017-2018](https://iasext.wesleyan.edu/regprod/!wesmaps_page.html?term=1181) and exported as JSON by running `scrapy crawl cs -o cs.json`
+With Scrapy, course names are scraped from [WesMaps 2017-2018](https://iasext.wesleyan.edu/regprod/!wesmaps_page.html?term=1181) and exported as JSON by running
+`scrapy crawl cs -o cs.json`
 
 ### HTML, JavaScript
 
