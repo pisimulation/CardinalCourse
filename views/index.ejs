@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cardinal Courses</title>
+    
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="wesmap.css">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+
+</head>
+<body>
+
+  <div id="search">
+    <h1>CARDINAL COURSE</h1>
+    <div class="container">
+		    <input type="text" class="form-control" id="name-dep-input" placeholder="Enter course name">
+            <button type="button" class="btn btn-primary" href="" id="search-btn" >Search</button>
+    </div>
+      
+  <br>
+  <div class="container">
+  <ul id="course-list" class="list-group">
+    
+  </ul>
+  </div>
+      
+  </div>
+  <script>
+    $(window).on('load', function(e) {
+        $('#name-dep-input')[0].value = '';
+    })
+
+    $('#search-btn').on('click', function(e) {
+        e.preventDefault();
+        var searchQuery = $('#name-dep-input')[0].value;
+        $('#name-dep-input')[0].value = '';
+        $.ajax({
+            url: '/search',
+            data: {
+                searchQuery: searchQuery
+            }
+        }).done(function(res) {
+            console.log(res)
+            if (res.length === 0) {
+                $('#course-list').html(`
+                    <h3 class="text-center"> No matches were found </h3>
+                `);
+                return;
+            };
+            
+            res.forEach(function(course) {
+                $('#course-list').html(`
+                    <li class="list-group-item">
+                    <h2>${course.name}</h2>
+                    <br>
+                    <ul id="review-list" class="list-group">   
+                    </li>
+                `
+            )
+            })
+            
+            res.forEach(function(course) {
+                course.reviews.forEach(function(review) {
+                    $('#review-list').append(`
+                        <li class="list-group-item">
+                            ${review}
+                        </li>
+                    `)
+                })
+                $('#course-list').append(`
+                    <div class="form-group">
+                        <textarea class="form-control" id="review-txt" rows="3" placeholder="Add your review"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                `)
+            })
+            
+            $('#submit-btn').on('click', function(e) {
+                e.preventDefault();
+                var review = $('#review-txt').val()
+                console.log("This is review")
+                console.log(review)
+                fetch('add', {
+                    method: 'put',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name : res[0].name,
+                        review : review
+                    })
+                }).then(res => {
+                    $('#review-txt').val('')
+                    $('#review-list').append(`
+                        <li class="list-group-item">
+                            ${review}
+                        </li>
+                    `)
+                    if (res.ok) return res.json()
+                })
+            });
+        })
+    })
+    
+    
+    
+  </script>  
+
+    
+    
+  <!--
+  <div id="all">
+  <h2>ARTS AND HUMANITIES</h2>
+    <h3>Arabic</h3>
+        <p id="ARAB"></p>
+    <h3>Art History</h3>
+        <p id="ARHA"></p>
+    <h3>Art Studio</h3>
+        <p id="ARST"></p>
+    <h3>Chinese</h3>
+        <p id="CHIN"></p>
+    <h3>Classical Civilization</h3>
+        <p id="CCIV"></p>
+    <h3>College of East Asian Studies</h3>
+        <p id="CEAS"></p>
+    <h3>College of Film and the Moving Image</h3>
+        <p id="FILM"></p>
+    <h3>College of Letters</h3>
+        <p id="COL"></p>
+    <h3>Dance</h3>
+        <p id="DANC"></p>
+    <h3>English</h3>
+        <p id="ENGL"></p>
+    <h3>French</h3>
+        <p id="FREN"></p>
+    <h3>French Studies in Translation</h3>
+        <p id="FSTR"></p>
+    <h3>German Literature in English</h3>
+        <p id="GELT"></p>
+    <h3>German Studies</h3>
+        <p id="GRST"></p>
+    <h3>Greek</h3>
+        <p id="GRK"></p>
+    <h3>Hebrew</h3>
+        <p id="HEBR"></p>
+    <h3>Italian</h3>
+        <p id="ITAL"></p>
+    <h3>Italian Studies in Translation</h3>
+        <p id="ISTR"></p>
+    <h3>Japanese</h3>
+        <p id="JAPN"></p>
+    <h3>Korean</h3>
+        <p id="KREA"></p>
+    <h3>Latin</h3>
+        <p id="LAT"></p>
+    <h3>Less Commonly Taught Languages</h3>
+        <p id="LANG"></p>
+    <h3>Music</h3>
+        <p id="MUSC"></p>
+    <h3>Portuguese</h3>
+        <p id="PORT"></p>
+    <h3>Russian</h3>
+        <p id="RUSS"></p>
+    <h3>Russian Literature in English</h3>
+        <p id="RULE"></p>
+    <h3>Spanish</h3>
+        <p id="SPAN"></p>
+    <h3>Spanish/Hispanic Cultures in Translation</h3>
+        <p id="SSTR"></p>
+    <h3>Theater</h3>
+        <p id="THEA"></p>
+    
+    <h2>SOCIAL SCIENCES</h2>
+    <h3>American Studies</h3>
+        <p id="AMST"></p>
+    <h3>Anthropology</h3>
+        <p id="ANTH"></p>
+    <h3>College of Social Studies</h3>
+        <p id="CSS"></p>
+    <h3>Economics</h3>
+        <p id="ECON"></p>
+    <h3>Government</h3>
+        <p id="GOVT"></p>
+    <h3>History</h3>
+        <p id="HIST"></p>
+    <h3>Philosophy</h3>
+        <p id="PHIL"></p>
+    <h3>Religion</h3>
+        <p id="RELI"></p>
+    <h3>Sociology</h3>
+        <p id="SOC"></p>
+    
+    <h2>CERTIFICATES</h2>
+    <h3>Applied Data Science</h3>
+        <p id="CADS"></p>
+    <h3>Civic Engagement</h3>
+        <p id="CEC"></p>
+    <h3>Environmental Studies</h3>
+        <p id="CES"></p>
+    <h3>Informatics and Modeling</h3>
+        <p id="CIM"></p>
+    <h3>International Relations</h3>
+        <p id="CIR"></p>
+    <h3>Jewish and Israel Studies</h3>
+        <p id="CJS"></p>
+    <h3>Middle Eastern Studies</h3>
+        <p id="CMES"></p>
+    <h3>Molecular Biophysics</h3>
+        <p id="CMB"></p>
+    <h3>Social, Cultural, and Critical Theory</h3>
+        <p id="CSCT"></p>
+    <h3>South Asia Studies</h3>
+        <p id="CSA"></p>
+    <h3>The Study of Education</h3>
+        <p id="CSED"></p>
+    <h3>Writing</h3>
+        <p id="CWRC"></p>
+    
+    <h2>NATURAL SCIENCES AND MATHEMATICS</h2>
+    <h3>Astronomy</h3>
+        <p id="ASTR"></p>
+    <h3>Biology</h3>
+        <p id="BIOL"></p>
+    <h3>Chemistry</h3>
+        <p id="CHEM"></p>
+    <h3>College of Integrative Sciences</h3>
+        <p id="CIS"></p>
+    <h3>Computer Science</h3>
+        <p id="COMP"></p>
+    <h3>Earth and Environmental Sciences</h3>
+        <p id="EES"></p>
+    <h3>Mathematics</h3>
+        <p id="MATH"></p>
+    <h3>Molecular Biology and Biochemistry</h3>
+        <p id="MBB"></p>
+    <h3>Neuroscience and Behavior</h3>
+        <p id="NSB"></p>
+    <h3>Physics</h3>
+        <p id="PHYS"></p>
+    <h3>Psychology</h3>
+        <p id="PSYC"></p>
+    
+    <h2>COURSE CLUSTERS</h2>
+    <h3>African Studies</h3>
+        <p id="XAFS"></p>
+    <h3>Animal Studies</h3>
+        <p id="XAMS"></p>
+    <h3>Christianity Studies</h3>
+        <p id="XCHS"></p>
+    <h3>Disability Studies</h3>
+        <p id="XDST"></p>
+    <h3>Health Studies</h3>
+        <p id="XHST"></p>
+    <h3>Planetary Science</h3>
+        <p id="XPSC"></p>
+    <h3>Queer Studies</h3>
+        <p id="XQST"></p>
+    <h3>Service-Learning</h3>
+        <p id="XSER"></p>
+    <h3>Urban Studies</h3>
+        <p id="XURS"></p>
+    
+    <h2>INTERDISCIPLINARY PROGRAMS</h2>
+    <h3>African American Studies Program</h3>
+        <p id="AFAM"></p>
+    <h3>Archaeology Program</h3>
+        <p id="ARCP"></p>
+    <h3>Center for Global Studies</h3>
+        <p id="CGST"></p>
+    <h3>Center for Jewish Studies</h3>
+        <p id="CJST"></p>
+    <h3>Center for the Humanities</h3>
+        <p id="CHUM"></p>
+    <h3>Center for the Study of Public Life</h3>
+        <p id="CSPL"></p>
+    <h3>College of the Environment</h3>
+        <p id="ENVS"></p>
+    <h3>Feminist, Gender, and Sexuality Studies Program</h3>
+        <p id="FGSS"></p>
+    <h3>Latin American Studies Program</h3>
+        <p id="LAST"></p>
+    <h3>Medieval Studies Program</h3>
+        <p id="MDST"></p>
+    <h3>Quantitative Analysis Center</h3>
+        <p id="QAC"></p>
+    <h3>Russian, East European, and Eurasian Studies Program</h3>
+        <p id="REES"></p>
+    <h3>Science in Society Program</h3>
+        <p id="SISP"></p>
+    <h3>Writing Center</h3>
+        <p id="WRCT"></p>
+    
+    <h2>Other</h2>
+    <h3>Physical Education</h3>
+        <p id="PHED"></p>
+
+    </div>
+   
+  <script type="text/javascript" src="wesmap.js"></script>
+-->
+
+</body>
+</html>
