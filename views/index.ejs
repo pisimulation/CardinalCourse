@@ -9,7 +9,11 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 
+></script>
+
+
 </head>
+    
 <body>
 
   <div id="search">
@@ -28,6 +32,10 @@
       
   </div>
   <script>
+
+      
+      
+      
     $(window).on('load', function(e) {
         $('#name-dep-input')[0].value = '';
     })
@@ -62,24 +70,38 @@
             })
             
             res.forEach(function(course) {
-                course.reviews.forEach(function(review) {
+                course.reviews.forEach(function(entry) {
                     $('#review-list').append(`
                         <li class="list-group-item">
-                            ${review}
+
+                            <h3>"${entry.review}"</h3>
+                            <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
                         </li>
                     `)
                 })
                 $('#course-list').append(`
-                    <div class="form-group">
+                    <br>
+                    <li class="list-group-item">
                         <textarea class="form-control" id="review-txt" rows="3" placeholder="Add your review"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                        <input class="form-control" type="text" placeholder="Name" id="postBy" style='display: inline; width: 30%;'>
+                        <input class="form-control" type="text" placeholder="Professor" id="prof" style='display: inline; width: 29%;'>
+                        <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="sem" style='display: inline; width: 20%;'>
+                        <input class="form-control" type="text" placeholder="Grade" id="grade" style='display: inline; width: 13%;'>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                    </li>
+
                 `)
             })
-            
+            /*
+                if a new review is added, contact server to update database
+            */
             $('#submit-btn').on('click', function(e) {
                 e.preventDefault();
                 var review = $('#review-txt').val()
+                var postBy = $('#postBy').val()
+                var prof = $('#prof').val()
+                var sem = $('#sem').val()
+                var grade = $('#grade').val()
                 console.log("This is review")
                 console.log(review)
                 fetch('add', {
@@ -87,14 +109,18 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         name : res[0].name,
-                        review : review
+                        postBy: postBy,
+                        prof: prof,
+                        review : review,
+                        sem: sem,
+                        grade: grade
                     })
                 }).then(res => {
                     $('#review-txt').val('')
                     $('#review-list').append(`
                         <li class="list-group-item">
-                            ${review}
-                        </li>
+                        <h3>"${review}"</h3>
+                        <p>${postBy}, took it with ${prof} in ${sem}. Grade received: ${grade}</p>
                     `)
                     if (res.ok) return res.json()
                 })

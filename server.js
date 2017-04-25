@@ -55,6 +55,10 @@ var allCourses = []
 wesmap_JSON.forEach(function(dep, index) {
     allCourses = allCourses.concat(wesmap_JSON[index][Object.keys(dep)[0]])
 })
+/*
+    use this variable to access all courses of all departments, no duplicates
+    i.e. dedup_allCourses = [...,'Drawing I',...'Computer Science I',...]
+*/
 var dedup_allCourses = dedup(allCourses)
 
 mongoClient.connect(dbAddr, (err, database) => {
@@ -80,7 +84,17 @@ mongoClient.connect(dbAddr, (err, database) => {
                 coursesDb.save({
                     name: course,
                     id: index,
-                    reviews : ["great class", "awesome"]
+                    reviews : [{postBy: "pi",
+                                prof: "Prof. Awesome",
+                                review: "great class",
+                                sem: "spring 2017",
+                                grade: "A"
+                               },
+                               {postBy: "cookie monster",
+                                prof: "Prof. summer",
+                                review: "meh",
+                                sem: "Spring 2017",
+                                grade: "A"}]
                 })
             })
         }
@@ -88,10 +102,17 @@ mongoClient.connect(dbAddr, (err, database) => {
     
 })
 
+/*
+    render homepage
+*/
 app.get('/', function(req,res) {
     res.render('index.ejs')
 })
 
+/*
+    handle search query
+    now allow only full course name
+*/
 app.get('/search', function(req,res) {
     console.log("Got a query!", req.query.searchQuery);
     var courseFound = dedup_allCourses.filter(function(course) {
@@ -105,8 +126,9 @@ app.get('/search', function(req,res) {
     })
     */
     var searchResult = courseFound //=== [] ? courseFound : wesmap_JSON
-    console.log(searchResult)
-    
+    /*
+        find course in database
+    */
     var cursor = db.collection('cardinalCourse').find({name: searchResult[0]}).toArray(function (err, result) {
         if (err) return console.log(err)
         res.json(result);
@@ -114,12 +136,20 @@ app.get('/search', function(req,res) {
 
 })
 
+/*
+    handle request to add review to database
+*/
 app.put('/add', (req,res) => {
-    console.log(req.body.name);
-    console.log(req.body.review)
+    /*
+        add review to existing list of reviews
+    */
     db.collection('cardinalCourse').findOneAndUpdate(
         {name: req.body.name}, 
-        {   $push: {reviews: req.body.review}
+        {   $push: {reviews: {postBy: req.body.postBy,
+                              prof: req.body.prof,
+                              review: req.body.review,
+                              sem: req.body.sem,
+                              grade: req.body.grade}}
         },
         {   sort: {_id: -1},
             upsert: true}, //update if found, insert if not found
