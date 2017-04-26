@@ -25,9 +25,7 @@
       
   <br>
   <div class="container">
-  <ul id="course-list" class="list-group">
-    
-  </ul>
+  <ul id="course-list" class="list-group"></ul>
   </div>
       
   </div>
@@ -50,48 +48,44 @@
                 searchQuery: searchQuery
             }
         }).done(function(res) {
-            console.log(res)
+            console.log(res[0].reviews);
             if (res.length === 0) {
                 $('#course-list').html(`
                     <h3 class="text-center"> No matches were found </h3>
                 `);
                 return;
             };
-            
-            res.forEach(function(course) {
-                $('#course-list').html(`
-                    <li class="list-group-item">
-                    <h2>${course.name}</h2>
-                    <br>
-                    <ul id="review-list" class="list-group">   
-                    </li>
-                `
-            )
-            })
-            
-            res.forEach(function(course) {
-                course.reviews.forEach(function(entry) {
-                    $('#review-list').append(`
-                        <li class="list-group-item">
 
-                            <h3>"${entry.review}"</h3>
-                            <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
-                        </li>
-                    `)
-                })
-                $('#course-list').append(`
-                    <br>
-                    <li class="list-group-item">
-                        <textarea class="form-control" id="review-txt" rows="3" placeholder="Add your review"></textarea>
-                        <input class="form-control" type="text" placeholder="Name" id="postBy" style='display: inline; width: 30%;'>
-                        <input class="form-control" type="text" placeholder="Professor" id="prof" style='display: inline; width: 29%;'>
-                        <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="sem" style='display: inline; width: 20%;'>
-                        <input class="form-control" type="text" placeholder="Grade" id="grade" style='display: inline; width: 13%;'>
-                        <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
-                    </li>
 
-                `)
-            })
+
+            document.getElementById('course-list').innerHTML =
+                res.map((course) => {
+                    return `
+                            <li class="list-group-item">
+                              <h2>${course.name}</h2>
+                              <br>
+                              <ul id="review-list" class="list-group">`+
+                                  course.reviews.map(function(entry) {
+                                      return `
+                                              <li class="list-group-item">
+                                                <h3>" ${entry.review}"</h3>
+                                                <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
+                                              </li>
+                                            `}).join('') +
+                              `</ul>
+                            </li>
+                            <li class="list-group-item">
+                                <textarea class="form-control" id="review-txt" rows="3" placeholder="Add your review"></textarea>
+                                <input class="form-control" type="text" placeholder="Name" id="postBy" style='display: inline; width: 30%;'>
+                                <input class="form-control" type="text" placeholder="Professor" id="prof" style='display: inline; width: 29%;'>
+                                <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="sem" style='display: inline; width: 20%;'>
+                                <input class="form-control" type="text" placeholder="Grade" id="grade" style='display: inline; width: 13%;'>
+                                <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                            </li>
+                                  <br>
+                    `
+                }).join('');
+
             /*
                 if a new review is added, contact server to update database
             */
@@ -102,8 +96,8 @@
                 var prof = $('#prof').val()
                 var sem = $('#sem').val()
                 var grade = $('#grade').val()
-                console.log("This is review")
-                console.log(review)
+//                console.log("This is review")
+//                console.log(review)
                 fetch('add', {
                     method: 'put',
                     headers: {'Content-Type': 'application/json'},
@@ -126,7 +120,7 @@
                 })
             });
         })
-    })
+        });
     
     
     

@@ -10,6 +10,7 @@
 */
 var fs = require('fs');
 var wesmap_JSON = JSON.parse(fs.readFileSync('./public/cs.json', 'utf8'));
+
 var allMajors = [];
 for (var key in wesmap_JSON) {
   if (wesmap_JSON.hasOwnProperty(key)) {
@@ -45,7 +46,7 @@ app.set('port', (process.env.PORT || 3000))
     specify that view engine is ejs
     now can use render
 */
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
 
 
 /*
@@ -59,7 +60,7 @@ wesmap_JSON.forEach(function(dep, index) {
     use this variable to access all courses of all departments, no duplicates
     i.e. dedup_allCourses = [...,'Drawing I',...'Computer Science I',...]
 */
-var dedup_allCourses = dedup(allCourses)
+var dedup_allCourses = dedup(allCourses);
 
 mongoClient.connect(dbAddr, (err, database) => {
     /*
@@ -71,7 +72,7 @@ mongoClient.connect(dbAddr, (err, database) => {
     coursesDb = db.collection('cardinalCourse');
     app.listen(app.get('port'), function() {
         console.log("listening on port " + app.get('port'))
-    })
+    });
     
     /*
         if collection is empty,
@@ -115,9 +116,9 @@ app.get('/', function(req,res) {
 */
 app.get('/search', function(req,res) {
     console.log("Got a query!", req.query.searchQuery);
-    var courseFound = dedup_allCourses.filter(function(course) {
-		return course.toLowerCase() === req.query.searchQuery.toLowerCase();
-	})
+    // var courseFound = dedup_allCourses.filter(function(course) {
+	// 	return course.toLowerCase() === req.query.searchQuery.toLowerCase();
+	// })
     /* TODO: allow search by department, return list of classes
     //to access lists of courses of a department, matching index and key are needed:
     console.log(wesmap_JSON[0]['ARAB'])
@@ -125,12 +126,36 @@ app.get('/search', function(req,res) {
         return major.toLowerCase() === req.query.searchQuery.toLowerCase()
     })
     */
+
+    var courseList = wesmap_JSON.map((dep,i,arr) => {
+        return dep[`${Object.keys(dep)[0]}`].filter((course,index,arr1) => {
+            return `${Object.keys(dep)[0]}`.toLowerCase() === req.query.searchQuery.toLowerCase();
+        });
+    });
+
+    var courseFound = [];
+
+    courseList.forEach((lst) => {
+        lst.forEach((courseName) => {
+            courseFound.push(courseName);
+        });
+    });
+
+    courseFound = courseFound.filter((lst) => {
+        return lst !== [];
+    });
+
+
+
     var searchResult = courseFound //=== [] ? courseFound : wesmap_JSON
     /*
         find course in database
     */
-    var cursor = db.collection('cardinalCourse').find({name: searchResult[0]}).toArray(function (err, result) {
-        if (err) return console.log(err)
+    var cursor = db.collection('cardinalCourse').find({name: {
+        $in: courseFound
+    }}).toArray(function (err, result) {
+        // console.log(result,undefined,2);
+        if (err) return console.log(err);
         res.json(result);
     })
 
@@ -139,6 +164,7 @@ app.get('/search', function(req,res) {
 /*
     handle request to add review to database
 */
+
 app.put('/add', (req,res) => {
     /*
         add review to existing list of reviews
