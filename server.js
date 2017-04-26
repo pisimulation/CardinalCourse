@@ -11,6 +11,8 @@
 var fs = require('fs');
 var wesmap_JSON = JSON.parse(fs.readFileSync('./public/cs.json', 'utf8'));
 
+console.log(wesmap_JSON);
+
 var allMajors = [];
 for (var key in wesmap_JSON) {
   if (wesmap_JSON.hasOwnProperty(key)) {
@@ -129,9 +131,11 @@ app.get('/search', function(req,res) {
 
     var courseList = wesmap_JSON.map((dep,i,arr) => {
         return dep[`${Object.keys(dep)[0]}`].filter((course,index,arr1) => {
-            return `${Object.keys(dep)[0]}`.toLowerCase() === req.query.searchQuery.toLowerCase();
+            return `${Object.keys(dep)[0]}`.toLowerCase().search(req.query.searchQuery.toLowerCase()) !== -1;
         });
     });
+
+    // console.log(courseList);
 
     var courseFound = [];
 
@@ -144,6 +148,8 @@ app.get('/search', function(req,res) {
     courseFound = courseFound.filter((lst) => {
         return lst !== [];
     });
+
+    // console.log(courseFound);
 
 
 

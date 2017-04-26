@@ -9,7 +9,7 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 
-></script>
+</script>
 
 
 </head>
@@ -36,19 +36,20 @@
       
     $(window).on('load', function(e) {
         $('#name-dep-input')[0].value = '';
-    })
+    });
 
     $('#search-btn').on('click', function(e) {
         e.preventDefault();
         var searchQuery = $('#name-dep-input')[0].value;
         $('#name-dep-input')[0].value = '';
+        if (searchQuery === '') return;
         $.ajax({
             url: '/search',
             data: {
                 searchQuery: searchQuery
             }
         }).done(function(res) {
-            console.log(res[0].reviews);
+            console.log(res);
             if (res.length === 0) {
                 $('#course-list').html(`
                     <h3 class="text-center"> No matches were found </h3>
@@ -96,28 +97,33 @@
                 var prof = $('#prof').val()
                 var sem = $('#sem').val()
                 var grade = $('#grade').val()
-//                console.log("This is review")
-//                console.log(review)
-                fetch('add', {
-                    method: 'put',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        name : res[0].name,
-                        postBy: postBy,
-                        prof: prof,
-                        review : review,
-                        sem: sem,
-                        grade: grade
-                    })
-                }).then(res => {
-                    $('#review-txt').val('')
-                    $('#review-list').append(`
-                        <li class="list-group-item">
-                        <h3>"${review}"</h3>
-                        <p>${postBy}, took it with ${prof} in ${sem}. Grade received: ${grade}</p>
-                    `)
-                    if (res.ok) return res.json()
-                })
+                document.getElementById('review-txt').val = "";
+                document.getElementById('postBy').val = "";
+                document.getElementById('prof').val = "";
+                document.getElementById('sem').val = "";
+                document.getElementById('grade').val = "";
+                if (review.trim() !== "" && prof.trim() !== "" && sem.trim() !== "") {
+                  fetch('add', {
+                      method: 'put',
+                      headers: {'Content-Type': 'application/json'},
+                      body: JSON.stringify({
+                          name : res[0].name,
+                          postBy: postBy,
+                          prof: prof,
+                          review : review,
+                          sem: sem,
+                          grade: grade
+                      })
+                  }).then(res => {
+                      $('#review-txt').val('')
+                      $('#review-list').append(`
+                          <li class="list-group-item">
+                          <h3>"${review}"</h3>
+                          <p>${postBy}, took it with ${prof} in ${sem}. Grade received: ${grade}</p>
+                      `)
+                      if (res.ok) return res.json();
+                  })
+                    }
             });
         })
         });
