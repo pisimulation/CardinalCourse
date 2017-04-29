@@ -65,81 +65,81 @@
             };
             document.getElementById('course-list').innerHTML =
                 res.map((course,index) => {
-                    return
-                `
-                <div class="card">
-                    <div class="card-header" role="tab">
-                      <h3 class="mb-0">
-                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#${index}" aria-expanded="false" aria-controls="collapseOne">
-                          ${course.name}
-                        </a>
-                      </h3>
-                    </div>
+                    return `
+                        <div class="card">
+                            <div class="card-header" role="tab">
+                              <h3 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#${index}" aria-expanded="false" aria-controls="collapseOne">
+                                  ${course.name}
+                                </a>
+                              </h3>
+                            </div>
 
-                    <div id="${index}" class="collapse" role="tabpanel">
-                        <div class="card-block" id="review-list">
-                ` +
-                    course.reviews.map(function(entry) {
-                        return `
-                          <li class="list-group-item">
-                            <h4>" ${entry.review}"</h4>
-                            <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
-                          </li>
-                        `}).join('') +
-                `
-                        </div>
-                <li class="list-group-item">
-                    <textarea class="form-control" id="review-txt" rows="3" placeholder="Add your review"></textarea>
-                    <input class="form-control" type="text" placeholder="Name" id="postBy" style='display: inline; width: 30%;'>
-                    <input class="form-control" type="text" placeholder="Professor" id="prof" style='display: inline; width: 29%;'>
-                    <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="sem" style='display: inline; width: 20%;'>
-                    <input class="form-control" type="text" placeholder="Grade (optional)" id="grade" style='display: inline; width: 13%;'>
-                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
-                </li>
-                    </div>
-                </div>`
+                            <div id="${index}" class="collapse" role="tabpanel">
+                              <div class="card-block review-list" id="${index}review-list">
+                        ` +
+                                course.reviews.map(function(entry) {
+                                                              return `
+                                                                      <li class="list-group-item">
+                                                                        <h4>" ${entry.review}"</h4>
+                                                                        <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
+                                                                      </li>
+                                                                    `}).join('') +
+                        `
+                              </div>
+                        <li class="list-group-item">
+                            <textarea class="form-control" id="${index}review-txt" rows="3" placeholder="Add your review"></textarea>
+                            <input class="form-control" type="text" placeholder="Name" id="${index}postBy" style='display: inline; width: 30%;'>
+                            <input class="form-control" type="text" placeholder="Professor" id="${index}prof" style='display: inline; width: 29%;'>
+                            <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="${index}sem" style='display: inline; width: 20%;'>
+                            <input class="form-control" type="text" placeholder="Grade (optional)" id="${index}grade" style='display: inline; width: 13%;'>
+                            <button type="submit" class="btn btn-primary" id="${index}submit-btn">Submit</button>
+                       </li>
+                            </div>
+                        </div>`
+
                 }).join('');
 
             /*
-                TODO: add review for every course except first result does not work
                 if a new review is added, contact server to update database
             */
-            $('#submit-btn').on('click', function(e) {
-                console.log(e)
-                e.preventDefault();
-                var review = $('#review-txt').val()
-                var postBy = $('#postBy').val()
-                var prof = $('#prof').val()
-                var sem = $('#sem').val()
-                var grade = $('#grade').val() == "" ? "-" : $('#grade').val();
-                $('#review-txt').val('')
-                $('#postBy').val('')
-                $('#prof').val('')
-                $('#sem').val('')
-                $('#grade').val('')
-                
-                if (review.trim() !== "" && prof.trim() !== "" && sem.trim() !== "") {
-                  fetch('add', {
-                      method: 'put',
-                      headers: {'Content-Type': 'application/json'},
-                      body: JSON.stringify({
-                          name : res[0].name,
-                          postBy: postBy,
-                          prof: prof,
-                          review : review,
-                          sem: sem,
-                          grade: grade
+            res.map((course,index) => {
+                $('#' + index + 'submit-btn').on('click', function(e) {
+                    console.log(e)
+                    e.preventDefault();
+                    var review = $('#' + index + 'review-txt').val()
+                    var postBy = $('#' + index + 'postBy').val()
+                    var prof = $('#' + index + 'prof').val()
+                    var sem = $('#' + index + 'sem').val()
+                    var grade = $('#' + index + 'grade').val() == "" ? "-" : $('#' + index + 'grade').val();
+                    $('#' + index + 'review-txt').val('')
+                    $('#' + index + 'postBy').val('')
+                    $('#' + index + 'prof').val('')
+                    $('#' + index + 'sem').val('')
+                    $('#' + index + 'grade').val('')
+
+                    if (review.trim() !== "" && prof.trim() !== "" && sem.trim() !== "") {
+                      fetch('add', {
+                          method: 'put',
+                          headers: {'Content-Type': 'application/json'},
+                          body: JSON.stringify({
+                              name : res[index].name,
+                              postBy: postBy,
+                              prof: prof,
+                              review : review,
+                              sem: sem,
+                              grade: grade
+                          })
+                      }).then(res => {
+                          $('#' + index + 'review-list').append(`
+                              <li class="list-group-item">
+                              <h3>"${review}"</h3>
+                              <p>${postBy}, took it with ${prof} in ${sem}. Grade received: ${grade}</p>
+                          `)
+                          if (res.ok) return res.json();
                       })
-                  }).then(res => {
-                      $('#review-txt').val('')
-                      $('#review-list').append(`
-                          <li class="list-group-item">
-                          <h3>"${review}"</h3>
-                          <p>${postBy}, took it with ${prof} in ${sem}. Grade received: ${grade}</p>
-                      `)
-                      if (res.ok) return res.json();
-                  })
-                    }
+                        }
+                });
             });
         })
         });
