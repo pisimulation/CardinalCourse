@@ -1,8 +1,6 @@
 /*
     TODO:
-    - search suggestions
-    - search by department
-    - add username for each review
+    - special topics in CS are actually different courses
 */
 
 /*
@@ -87,7 +85,8 @@ mongoClient.connect(dbAddr, (err, database) => {
                 coursesDb.save({
                     name: course,
                     id: index,
-                    reviews : [{postBy: "pi",
+                    reviews : []
+                            /*[{postBy: "pi",
                                 prof: "Prof. Awesome",
                                 review: "great class",
                                 sem: "spring 2017",
@@ -97,7 +96,7 @@ mongoClient.connect(dbAddr, (err, database) => {
                                 prof: "Prof. summer",
                                 review: "meh",
                                 sem: "Spring 2017",
-                                grade: "A"}]
+                                grade: "A"}]*/
                 })
             })
         }

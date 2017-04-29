@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <title>Cardinal Courses</title>
     
-  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="wesmap.css">
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js">
     </script>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
@@ -65,6 +62,23 @@
             };
             document.getElementById('course-list').innerHTML =
                 res.map((course,index) => {
+                    if(course.reviews.length == 0) {
+                        var content =
+                            `
+                              <li class="list-group-item">
+                                <h4>No reviews</h4>
+                                <p>Add yours below!</p>
+                              </li>`
+                    } else {
+                        var content =
+                            course.reviews.map(function(entry) {
+                              return `
+                                      <li class="list-group-item">
+                                        <h4>" ${entry.review}"</h4>
+                                        <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
+                                      </li>
+                                    `}).join('')
+                    }
                     return `
                         <div class="card">
                             <div class="card-header" role="tab">
@@ -77,14 +91,7 @@
 
                             <div id="${index}" class="collapse" role="tabpanel">
                               <div class="card-block review-list" id="${index}review-list">
-                        ` +
-                                course.reviews.map(function(entry) {
-                                                              return `
-                                                                      <li class="list-group-item">
-                                                                        <h4>" ${entry.review}"</h4>
-                                                                        <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
-                                                                      </li>
-                                                                    `}).join('') +
+                        ` + content +
                         `
                               </div>
                         <li class="list-group-item">
@@ -97,7 +104,6 @@
                        </li>
                             </div>
                         </div>`
-
                 }).join('');
 
             /*
