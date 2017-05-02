@@ -14,8 +14,6 @@
     <!--TODO:
       - up vote & down vote for posts, auto-delete if down votes more than n 
       - remove "No reviews" when first review is added
-      - COMP special topics are different courses but all are deduped.
-        Maybe we can manually rename the courses in cs.json?
       - implement ratings for courses
     -->
     
@@ -120,6 +118,7 @@
                             <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="${index}sem" style='display: inline; width: 20%;'>
                             <input class="form-control" type="text" placeholder="Grade (optional)" id="${index}grade" style='display: inline; width: 13%;'>
                             <button type="submit" class="btn btn-primary" id="${index}submit-btn">Submit</button>
+                            <p id="missingField"></p>
                        </li>
                             </div>
                         </div>`
@@ -136,13 +135,17 @@
                     var prof = $('#' + index + 'prof').val()
                     var sem = $('#' + index + 'sem').val()
                     var grade = $('#' + index + 'grade').val() == "" ? "-" : $('#' + index + 'grade').val();
-                    $('#' + index + 'review-txt').val('')
-                    $('#' + index + 'postBy').val('')
-                    $('#' + index + 'prof').val('')
-                    $('#' + index + 'sem').val('')
-                    $('#' + index + 'grade').val('')
-
-                    if (review.trim() !== "" && prof.trim() !== "" && sem.trim() !== "") {
+                    if (postBy.trim() !== "" &&
+                        review.trim() !== "" &&
+                        prof.trim() !== "" &&
+                        sem.trim() !== "") {
+                      $('#' + index + 'review-txt').val('')
+                      $('#' + index + 'postBy').val('')
+                      $('#' + index + 'prof').val('')
+                      $('#' + index + 'sem').val('')
+                      $('#' + index + 'grade').val('')
+                      $('#missingField').val('')
+                      //document.getElementById('missingField').innerHTML = ""
                       fetch('add', {
                           method: 'put',
                           headers: {'Content-Type': 'application/json'},
@@ -159,6 +162,8 @@
                           //  console.log("no reviews")
                           //  document.getElementById('course-list').innerHTML = ""
                           //}
+                          document.getElementById('missingField').innerHTML = "Thanks for your review!"
+                          $('#missingField').val('');
                           $('#' + index + 'review-list').append(`
                                 <li class="list-group-item">
                                         <div id="reviews">
@@ -171,10 +176,13 @@
                                         </div>
                                         </div>
                                 </li>
-                          `)
+                          `);
                           if (res.ok) return res.json();
                       })
-                        }
+                    } else {
+                        console.log("missing required field(s)")
+                        document.getElementById('missingField').innerHTML = "missing required field(s)"
+                    }
                 });
             });
         })
