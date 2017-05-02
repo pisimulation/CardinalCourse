@@ -11,7 +11,7 @@ In terminal, run
 Then, go to `http://localhost:3000/` in your browser.
 
 ## Status
-I am reviving a hackathon project from the WesHack 2015. This project is still incomplete. I am currently working on the back end. A user can now search for courses using full name. List of reviews will appear and the user can add their own review which will be added to database.
+I am reviving a hackathon project from the WesHack 2015. This project is still incomplete. I am currently working on the back end. A user can now search for courses using department names, e.g. COMP, math. List of courses will appear. Each course has reviews and the user can add their own review which will be added to database.
 
 ## Tool Used
 
@@ -24,3 +24,7 @@ With Scrapy, course names are scraped from [WesMaps 2017-2018](https://iasext.we
 ### NodeJS, ExpressJS, jQuery
 
 Course reviews are stored in MongoDB database. List of dependencies can be found in package.json
+
+### Bootstrap
+
+Bootstrap forms, buttons, collapse divs, etc.
