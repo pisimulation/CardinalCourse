@@ -3,25 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <title>Cardinal Courses</title>
-    
   <link rel="stylesheet" type="text/css" href="wesmap.css">
-    </script>
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-</script>
-
-
 </head>
     
 <body>
 
+    <!--TODO:
+      - up vote & down vote for posts, auto-delete if down votes more than n 
+      - remove "No reviews" when first review is added
+    -->
+    
+    
   <div id="search">
     <h1>CARDINAL COURSE</h1>
-    <div class="container">
-		    <input type="text" class="form-control" id="name-dep-input" placeholder="Enter department (e.g. comp)">
-            <button type="button" class="btn btn-primary" href="" id="search-btn" >Search</button>
+    <br>
+    <div class="container">    
+    <div class="input-group">
+      <input type="text" class="form-control" id="name-dep-input" placeholder="Enter department (e.g. comp)">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" href="" id="search-btn">Search</button>
+      </span>
+    </div>
     </div>
       
   <br>
@@ -35,7 +40,11 @@
     </div>
   <script>
 
-      
+    $("#name-dep-input").keyup(function(event){
+        if(event.keyCode == 13){
+            $("#search-btn").click();
+        }
+    });
       
       
     $(window).on('load', function(e) {
@@ -74,8 +83,15 @@
                             course.reviews.map(function(entry) {
                               return `
                                       <li class="list-group-item">
+                                        <div id="reviews">
                                         <h4>" ${entry.review}"</h4>
-                                        <p>${entry.postBy}, took it with ${entry.prof} in ${entry.sem}. Grade received: ${entry.grade}</p>
+                                        <div id="poster">
+                                        <p><b>Posted by</b>: ${entry.postBy}
+                                        | <b>Instructor</b>: ${entry.prof}
+                                        | <b>Semester</b>: ${entry.sem}
+                                        | <b>Grade received</b>: ${entry.grade}</p>
+                                        </div>
+                                        </div>
                                       </li>
                                     `}).join('')
                     }
@@ -94,7 +110,7 @@
                         ` + content +
                         `
                               </div>
-                        <li class="list-group-item">
+                        <li class="list-group-item" id="addReview">
                             <textarea class="form-control" id="${index}review-txt" rows="3" placeholder="Add your review"></textarea>
                             <input class="form-control" type="text" placeholder="Name" id="${index}postBy" style='display: inline; width: 30%;'>
                             <input class="form-control" type="text" placeholder="Professor" id="${index}prof" style='display: inline; width: 29%;'>
@@ -111,7 +127,6 @@
             */
             res.map((course,index) => {
                 $('#' + index + 'submit-btn').on('click', function(e) {
-                    console.log(e)
                     e.preventDefault();
                     var review = $('#' + index + 'review-txt').val()
                     var postBy = $('#' + index + 'postBy').val()
@@ -137,10 +152,22 @@
                               grade: grade
                           })
                       }).then(res => {
+                          //if(course.reviews.length == 0) {
+                          //  console.log("no reviews")
+                          //  document.getElementById('course-list').innerHTML = ""
+                          //}
                           $('#' + index + 'review-list').append(`
-                              <li class="list-group-item">
-                              <h3>"${review}"</h3>
-                              <p>${postBy}, took it with ${prof} in ${sem}. Grade received: ${grade}</p>
+                                <li class="list-group-item">
+                                        <div id="reviews">
+                                        <h4>" ${review}"</h4>
+                                        <div id="poster">
+                                        <p><b>Posted by</b>: ${postBy}
+                                        | <b>Instructor</b>: ${prof}
+                                        | <b>Semester</b>: ${sem}
+                                        | <b>Grade received</b>: ${grade}</p>
+                                        </div>
+                                        </div>
+                                </li>
                           `)
                           if (res.ok) return res.json();
                       })
