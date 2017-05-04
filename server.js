@@ -1,15 +1,8 @@
 /*
-    TODO:
-    - special topics in CS are actually different courses
-*/
-
-/*
     read from cs.json by synchronous request
 */
 var fs = require('fs');
 var wesmap_JSON = JSON.parse(fs.readFileSync('./public/cs.json', 'utf8'));
-
-console.log(wesmap_JSON);
 
 var allMajors = [];
 for (var key in wesmap_JSON) {
@@ -117,16 +110,6 @@ app.get('/', function(req,res) {
 */
 app.get('/search', function(req,res) {
     console.log("Got a query!", req.query.searchQuery);
-    // var courseFound = dedup_allCourses.filter(function(course) {
-	// 	return course.toLowerCase() === req.query.searchQuery.toLowerCase();
-	// })
-    /* TODO: allow search by department, return list of classes
-    //to access lists of courses of a department, matching index and key are needed:
-    console.log(wesmap_JSON[0]['ARAB'])
-    var majorFound = wesmap_JSON.filter(function(major) {
-        return major.toLowerCase() === req.query.searchQuery.toLowerCase()
-    })
-    */
 
     var courseList = wesmap_JSON.map((dep,i,arr) => {
         return dep[`${Object.keys(dep)[0]}`].filter((course,index,arr1) => {
@@ -134,7 +117,6 @@ app.get('/search', function(req,res) {
         });
     });
 
-    // console.log(courseList);
 
     var courseFound = [];
 
@@ -148,10 +130,6 @@ app.get('/search', function(req,res) {
         return lst !== [];
     });
 
-    // console.log(courseFound);
-
-
-
     var searchResult = courseFound //=== [] ? courseFound : wesmap_JSON
     /*
         find course in database
@@ -159,7 +137,6 @@ app.get('/search', function(req,res) {
     var cursor = db.collection('cardinalCourse').find({name: {
         $in: courseFound
     }}).toArray(function (err, result) {
-        // console.log(result,undefined,2);
         if (err) return console.log(err);
         res.json(result);
     })
