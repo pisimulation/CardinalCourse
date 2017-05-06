@@ -18,7 +18,7 @@
 
     <!--TODO:
       - up vote & down vote for posts, auto-delete if down votes more than n
-      - implement ratings for courses
+      - implement ratings for courses (doing this right now)
       - improve review box design
       - improve design (too much centering?)
     -->
@@ -115,7 +115,7 @@
                                   ${course.name}
                                 </a>
                               </h3>
-<input type="number" name="ratingInput" id="some_id" class="rating" />
+<input type="number" name="ratingInput" id="${index}rating" class="rating" />
 
                             </div>
 
@@ -139,13 +139,34 @@
             $('input.rating').rating({
                 clearable: true
             });
-            $('.rating').change(function() {
-                console.log($('.rating').val());
-            })
+            
             /*
                 if a new review is added, contact server to update database
             */
             res.map((course,index) => {
+                var rating;
+                $('#' + index + 'rating').change(function() {
+                    rating = $('#' + index + 'rating').val();
+                    console.log(rating)
+                    
+                    /*
+                    CONTINUE :
+                    - get existing rating from server
+                    - calculate new rating and update it
+                    - use local storage to store ratings; prevent user from revoting
+                    - display initial rating according to the most updated rating
+                      (may have to fetch the data twice; when page loaded and after voted)
+                      
+                    fetch('add', {
+                          method: 'put',
+                          headers: {'Content-Type': 'application/json'},
+                          body: JSON.stringify({
+                              
+                          })
+                      }).then(res => {})
+                    */
+                    
+                })
                 $('#' + index + 'submit-btn').on('click', function(e) {
                     e.preventDefault();
                     var review = $('#' + index + 'review-txt').val()

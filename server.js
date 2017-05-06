@@ -78,12 +78,15 @@ mongoClient.connect(dbAddr, (err, database) => {
                 coursesDb.save({
                     name: course,
                     id: index,
+                    rating: {totalVote: 0,
+                             ave: 0},
                     reviews : []
                             /*[{postBy: "pi",
                                 prof: "Prof. Awesome",
                                 review: "great class",
                                 sem: "spring 2017",
-                                grade: "A"
+                                grade: "A",
+                                rating: 0
                                },
                                {postBy: "cookie monster",
                                 prof: "Prof. summer",
