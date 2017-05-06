@@ -34,7 +34,6 @@
       </span>
     </div>
     </div>
-      <!--<input type="number" name="your_awesome_parameter" id="test" class="rating" />-->
   <br>
   <div class="container">
   <div id="accordion" role="tablist" aria-multiselectable="true">
@@ -53,11 +52,6 @@
     </div>
     
   <script>
-      $('.rating').change(function() {
-          console.log($('.rating').val());
-      })
-      console.log($('.rating').val());
-
     $("#name-dep-input").keyup(function(event){
         if(event.keyCode == 13){
             $("#search-btn").click();
@@ -82,8 +76,6 @@
         }).done(function(res) {
             if (res.length === 0) {
                 $('#course-list').html(`
-
-<!--<input type="number" name="your_awesome_parameter" id="some_id" class="rating" />-->
                     <h3 class="text-center"> No matches were found </h3>
                     <h5 class="text-center"> Enter department abbreviation (e.g. comp, math, rees, hist, etc.) </h5>
                 `);
@@ -111,6 +103,7 @@
                                         | <b>Grade received</b>: ${entry.grade}</p>
                                         </div>
                                         </div>
+                                        
                                       </li>
                                     `}).join('')
                     }
@@ -122,6 +115,8 @@
                                   ${course.name}
                                 </a>
                               </h3>
+<input type="number" name="ratingInput" id="some_id" class="rating" />
+
                             </div>
 
                             <div id="${index}" class="collapse" role="tabpanel">
@@ -141,7 +136,12 @@
                             </div>
                         </div>`
                 }).join('');
-
+            $('input.rating').rating({
+                clearable: true
+            });
+            $('.rating').change(function() {
+                console.log($('.rating').val());
+            })
             /*
                 if a new review is added, contact server to update database
             */

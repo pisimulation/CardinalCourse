@@ -29,6 +29,7 @@
     "jsonfile": "^2.4.0",
     "mongodb": "^2.2.26",
     "nodemon": "^1.11.0",
+    "vue": "^2.3.2",
     "xmlhttprequest": "^1.8.0"
   }
 }
