@@ -78,8 +78,8 @@ mongoClient.connect(dbAddr, (err, database) => {
                 coursesDb.save({
                     name: course,
                     id: index,
-                    rating: {totalVote: 0,
-                             ave: 0},
+                    rating: {stars: 0,
+                             totalVote: 0},
                     reviews : []
                             /*[{postBy: "pi",
                                 prof: "Prof. Awesome",
@@ -149,24 +149,43 @@ app.get('/search', function(req,res) {
 /*
     handle request to add review to database
 */
-
 app.put('/add', (req,res) => {
     /*
         add review to existing list of reviews
     */
     db.collection('cardinalCourse').findOneAndUpdate(
         {name: req.body.name}, 
-        {   $push: {reviews: {postBy: req.body.postBy,
-                              prof: req.body.prof,
-                              review: req.body.review,
-                              sem: req.body.sem,
-                              grade: req.body.grade}}
+        {$push: {reviews: {postBy: req.body.postBy,
+                           prof: req.body.prof,
+                           review: req.body.review,
+                           sem: req.body.sem,
+                           grade: req.body.grade}}
         },
-        {   sort: {_id: -1},
-            upsert: true}, //update if found, insert if not found
+        {sort: {_id: -1},
+         upsert: true}, //update if found, insert if not found
         (err, result) =>
         {
             if (err) return res.send(err);
+            res.send(result);
+        })
+})
+
+/*
+    handle request to update ratings
+*/
+app.put('/rate', (req,res) => {
+    console.log(req.body.name)
+    console.log(req.body.stars)
+    db.collection('cardinalCourse').findOneAndUpdate(
+        {name: req.body.name},
+        {$inc: {
+            "rating.stars": Number(req.body.stars),
+            "rating.totalVote": 1
+        }},
+        {returnOriginal : false}, //return the updated document
+        (err, result) =>
+        {
+            console.log(result)
             res.send(result);
         })
 })

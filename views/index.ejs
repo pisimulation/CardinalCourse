@@ -83,6 +83,8 @@
             };
             document.getElementById('course-list').innerHTML =
                 res.map((course,index) => {
+                    // find average rating and display that many stars
+                    var ratingValue = res[index].rating.stars == 0 ? 0 : Math.round(res[index].rating.stars / res[index].rating.totalVote)
                     if(course.reviews.length == 0) {
                         var content =
                             `<li class="list-group-item">
@@ -115,7 +117,7 @@
                                   ${course.name}
                                 </a>
                               </h3>
-<input type="number" name="ratingInput" id="${index}rating" class="rating" />
+<div id="${index}ratingDiv"><input type="number" name="ratingInput" id="${index}rating" class="rating" value="${ratingValue}"/></div>
 
                             </div>
 
@@ -147,24 +149,39 @@
                 var rating;
                 $('#' + index + 'rating').change(function() {
                     rating = $('#' + index + 'rating').val();
-                    console.log(rating)
                     
                     /*
-                    CONTINUE :
-                    - get existing rating from server
-                    - calculate new rating and update it
+                    - update new rating with server
+                    - response from server is the updated entry
+                    - use that updated entry to display updated rating
+                    */
+                    
+                    /*
+                    TODO:
                     - use local storage to store ratings; prevent user from revoting
-                    - display initial rating according to the most updated rating
-                      (may have to fetch the data twice; when page loaded and after voted)
+                    */
                       
-                    fetch('add', {
+                    fetch('rate', {
                           method: 'put',
                           headers: {'Content-Type': 'application/json'},
                           body: JSON.stringify({
-                              
+                              name : res[index].name,
+                              stars: rating
                           })
-                      }).then(res => {})
-                    */
+                      }).then (res => {
+                        res.json().then(data => {
+                            var ave = Math.round(data.value.rating.stars / data.value.rating.totalVote)
+                            console.log("ALL STARS: " + data.value.rating.stars)
+                            console.log("VOTES: " + data.value.rating.totalVote)
+                            console.log("AVE: " + ave)
+                            document.getElementById(index + 'ratingDiv').innerHTML = `<input type="number" name="ratingInput" id="${index}rating" class="rating" value="${ave}" />`
+                            $('input.rating').rating({
+                                clearable: true
+                            });
+                        })
+                        
+                    })
+                    
                     
                 })
                 $('#' + index + 'submit-btn').on('click', function(e) {
