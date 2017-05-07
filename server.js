@@ -174,8 +174,6 @@ app.put('/add', (req,res) => {
     handle request to update ratings
 */
 app.put('/rate', (req,res) => {
-    console.log(req.body.name)
-    console.log(req.body.stars)
     db.collection('cardinalCourse').findOneAndUpdate(
         {name: req.body.name},
         {$inc: {
@@ -185,7 +183,6 @@ app.put('/rate', (req,res) => {
         {returnOriginal : false}, //return the updated document
         (err, result) =>
         {
-            console.log(result)
             res.send(result);
         })
 })
