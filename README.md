@@ -4,14 +4,19 @@ Wesleyan course review site for Wesleyan students to post ratings and reviews of
 
 ## Installation
 
-In terminal, run
+The project is now deployed on heroku. Check it out here:
+
+https://sheltered-bayou-66104.herokuapp.com/
+
+To run locally, download the repo, and in terminal, run
 
 `npm run dev`
 
 Then, go to `http://localhost:3000/` in your browser.
 
-## Status
-I am reviving a hackathon project from the WesHack 2015. This project is still incomplete. I am currently working on the back end. A user can now search for courses using department names, e.g. COMP, math. List of courses will appear. Each course has reviews and the user can add their own review which will be added to database.
+## Features
+
+Users can search courses by department abbreviation (e.g. russ, hist, comp), add their reviews, and rate courses. This project is originally started during the WesHack 2015.
 
 ## Tool Used
 
