@@ -40,13 +40,6 @@
       <ul id="course-list" class="list-group">
       </ul>
       
-      
-      
-      
-      
-      
-      
-      
   </div>
   </div>
     </div>
@@ -85,6 +78,21 @@
                 res.map((course,index) => {
                     // find average rating and display that many stars
                     var ratingValue = res[index].rating.stars == 0 ? 0 : Math.round(res[index].rating.stars / res[index].rating.totalVote)
+                    
+                    var newItems = JSON.parse(localStorage.getItem('coursesRated'))
+                    
+                    /*
+                        check if user has rated
+                        if so, make the star rating read-only
+                    */
+                    var rated = false;
+                    $.each(newItems, function(i,obj) {
+                      if (obj.courseRated === course.name) { rated = true; return false;}
+                    });
+                    var starInput = rated ?
+                      `<input type="number" id="${index}rating" class="rating" value="${ratingValue}" data-readonly/>` :
+                      `<input type="number" id="${index}rating" class="rating" value="${ratingValue}" />`
+                    
                     if(course.reviews.length == 0) {
                         var content =
                             `<li class="list-group-item">
@@ -117,8 +125,7 @@
                                   ${course.name}
                                 </a>
                               </h3>
-<div id="${index}ratingDiv"><input type="number" name="ratingInput" id="${index}rating" class="rating" value="${ratingValue}"/></div>
-
+                            <div id="${index}ratingDiv">`+ starInput + `</div>
                             </div>
 
                             <div id="${index}" class="collapse" role="tabpanel">
@@ -139,7 +146,7 @@
                         </div>`
                 }).join('');
             $('input.rating').rating({
-                clearable: true
+                clearable: false
             });
             
             /*
@@ -155,12 +162,6 @@
                     - response from server is the updated entry
                     - use that updated entry to display updated rating
                     */
-                    
-                    /*
-                    TODO:
-                    - use local storage to store ratings; prevent user from revoting
-                    */
-                      
                     fetch('rate', {
                           method: 'put',
                           headers: {'Content-Type': 'application/json'},
@@ -168,16 +169,23 @@
                               name : res[index].name,
                               stars: rating
                           })
-                      }).then (res => {
-                        res.json().then(data => {
+                      }).then (resp => {
+                        resp.json().then(data => {
                             var ave = Math.round(data.value.rating.stars / data.value.rating.totalVote)
                             console.log("ALL STARS: " + data.value.rating.stars)
                             console.log("VOTES: " + data.value.rating.totalVote)
                             console.log("AVE: " + ave)
-                            document.getElementById(index + 'ratingDiv').innerHTML = `<input type="number" name="ratingInput" id="${index}rating" class="rating" value="${ave}" />`
+                            document.getElementById(index + 'ratingDiv').innerHTML = `<input type="number" id="${index}rating" class="rating" value="${ave}" data-readonly />`
                             $('input.rating').rating({
-                                clearable: true
+                                clearable: false
                             });
+                            /*
+                                use local storage to store ratings; prevent user from rating again
+                            */
+                            // Create an array to hold the items
+                            var items = JSON.parse(localStorage.getItem('coursesRated')) || [];
+                            items.push({courseRated : res[index].name});
+                            localStorage.setItem('coursesRated', JSON.stringify(items))
                         })
                         
                     })
