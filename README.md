@@ -6,13 +6,13 @@ Wesleyan course review site for Wesleyan students to post ratings and reviews of
 
 The project is now deployed on heroku. Check it out here:
 
-https://sheltered-bayou-66104.herokuapp.com/
+https://cardinalcourse.herokuapp.com
 
 To run locally, download the repo, and in terminal, run
 
 `npm run dev`
 
-Then, go to `http://localhost:3000/` in your browser.
+Then, go to `http://localhost:3000` in your browser.
 
 ## Features
 
