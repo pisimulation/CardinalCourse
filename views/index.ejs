@@ -226,7 +226,6 @@
                           var indexReview = course.reviews.length
                           document.getElementById(index + 'addReview').innerHTML = "Thanks for your review!"
                           $('#missingField').val('');
-                          console.log(course.reviews)
                           $('#' + index + 'review-list').append(`
                                 <li class="list-group-item">
                                         <div id="reviews">
@@ -253,7 +252,6 @@
                           if (resp.ok) return resp.json();
                       })
                     } else {
-                        console.log("missing required field(s)")
                         document.getElementById(index + 'missingField').innerHTML = "missing required field(s)"
                     }
                 });
@@ -261,35 +259,58 @@
         })
         });
       
-      var upDownVotes = JSON.parse(localStorage.getItem('upDownVotes')) || [];
+      var upDownVotesItems = JSON.parse(localStorage.getItem('upDownVotes')) || [];
+      
+      function findAndRemove(array, property, value) {
+          array.forEach(function(result, index) {
+              if(result[property] === value) {
+              //Remove from array
+              array.splice(index, 1);
+              }    
+          });
+          return array
+      }
+      
       function upvote(coursename,indexReview,index) {
-          var upDown = JSON.parse(localStorage.getItem('upDownVotes'))
-          var upvoted = function() {
-              if (upDown == null) {
+          var mustVote = function() {
+              if (upDownVotesItems.length == 0) {
+                  upDownVotesItems.push({
+                      course: coursename + indexReview,
+                      vote: "down"
+                  })
+                  localStorage.setItem('upDownVotes', JSON.stringify(upDownVotesItems));
                   return "up"
               } else {
-                  var search = {};
-                  search[coursename + indexReview] = "down";
-                  var pi = $.inArray(search, upDownVotes)
-                  for (var i = 0 ; i < upDownVotes.length ; i++) {
-                      if (JSON.stringify(upDownVotes[i]) === JSON.stringify(search) ) {
-                          /*
-                            CONTINUE HERE
-                          */
-                          var index = upDownVotes.indexOf(search);
-                          upDownVotes.splice(index, 1);
-                          
-                          return "down"
-                      } else {
-                          alert("NO")
-                      }
-                  }
+                  var courseItem = $.grep(upDownVotesItems, function (item) {
+                      return item.course == coursename + indexReview;
+                  });
                   
+                  if(courseItem.length == 0) {
+                      upDownVotesItems.push({
+                          course: coursename + indexReview,
+                          vote: "down"
+                      })
+                      localStorage.setItem('upDownVotes', JSON.stringify(upDownVotesItems));
+                      return "up"
+                  }
+                  if(courseItem[0].vote == "down") {
+                      return "down"
+                  } else if (courseItem[0].vote == "up") {
+                      var newUpDownVotesItems = findAndRemove(upDownVotesItems, "course", coursename+indexReview)
+                      newUpDownVotesItems.push({
+                          course: coursename + indexReview,
+                          vote: "down"
+                      })
+                      localStorage.setItem('upDownVotes', JSON.stringify(newUpDownVotesItems));
+                      return "up"
+                  }
               }
-          }
-          if (upvoted() == "down") {
+          }()
+          
+          if (mustVote == "down") {
               return;
-          }        
+          }
+
           fetch('upvote', {
                 method: 'put',
                 headers: {'Content-Type': 'application/json'},
@@ -304,18 +325,49 @@
                 })
 
             })
-          var newUpVote = {};
-          newUpVote[coursename + indexReview] = "down";
-          upDownVotes.push(newUpVote);
-          localStorage.setItem('upDownVotes', JSON.stringify(upDownVotes));
       }
       
+      
       function downvote(coursename,indexReview,index) {
-          var reviewsDownvoted = JSON.parse(localStorage.getItem('reviewsDownvoted'))
-          var downvoted = $.inArray(coursename + indexReview, reviewsDownvoted)
-          if (downvoted >= 0) {
+          var mustVote = function() {
+              if (upDownVotesItems.length == 0) {
+                  upDownVotesItems.push({
+                      course: coursename + indexReview,
+                      vote: "up"
+                  })
+                  localStorage.setItem('upDownVotes', JSON.stringify(upDownVotesItems));
+                  return "down"
+              } else {
+                  var courseItem = $.grep(upDownVotesItems, function (item) {
+                      return item.course == coursename + indexReview;
+                  });
+                  
+                  if(courseItem.length == 0) {
+                      upDownVotesItems.push({
+                          course: coursename + indexReview,
+                          vote: "up"
+                      })
+                      localStorage.setItem('upDownVotes', JSON.stringify(upDownVotesItems));
+                      return "down"
+                  }
+                  if(courseItem[0].vote == "up") {
+                      return "up"
+                  } else if (courseItem[0].vote == "down") {
+                      var newUpDownVotesItems = findAndRemove(upDownVotesItems, "course", coursename+indexReview)
+                      newUpDownVotesItems.push({
+                          course: coursename + indexReview,
+                          vote: "up"
+                      })
+                      localStorage.setItem('upDownVotes', JSON.stringify(newUpDownVotesItems));
+                      return "down"
+                  }
+              }
+          }()
+          
+          if (mustVote == "up") {
               return;
-          }        
+          }
+          
           fetch('downvote', {
                 method: 'put',
                 headers: {'Content-Type': 'application/json'},
@@ -330,9 +382,6 @@
                 })
 
             })
-          var items = JSON.parse(localStorage.getItem('reviewsDownvoted')) || [];
-          items.push(coursename + indexReview);
-          localStorage.setItem('reviewsDownvoted', JSON.stringify(items));
       }
       
   </script>
