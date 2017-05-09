@@ -3,7 +3,7 @@
 */
 var fs = require('fs');
 var wesmap_JSON = JSON.parse(fs.readFileSync('./public/cs.json', 'utf8'));
-
+//[{"ARAB": ["Elementary Arabic I", "Intermediate Arabic I", "Advanced Arabic I", "Elementary Arabic II", "Intermediate Arabic II"]}]
 var allMajors = [];
 for (var key in wesmap_JSON) {
   if (wesmap_JSON.hasOwnProperty(key)) {
@@ -159,7 +159,8 @@ app.put('/add', (req,res) => {
                            prof: req.body.prof,
                            review: req.body.review,
                            sem: req.body.sem,
-                           grade: req.body.grade}}
+                           grade: req.body.grade,
+                           vote: 0}}
         },
         {sort: {_id: -1},
          upsert: true}, //update if found, insert if not found
@@ -183,6 +184,47 @@ app.put('/rate', (req,res) => {
         {returnOriginal : false}, //return the updated document
         (err, result) =>
         {
+            res.send(result);
+        })
+})
+
+/*
+    handle request to upvote/downvote a review
+*/
+app.put('/upvote', (req,res) => {
+    var i = req.body.index
+    var key = 'reviews.' + i +'.vote'
+    var obj = {}
+    obj[key] = 1
+    console.log(req.body)
+    db.collection('cardinalCourse').findOneAndUpdate(
+        {name: req.body.name},
+        {$inc: obj
+        },
+        {returnOriginal : false, //return the updated document
+         upsert: false}, 
+        (err, result) =>
+        {
+            console.log(result)
+            res.send(result);
+        })
+})
+
+app.put('/downvote', (req,res) => {
+    var i = req.body.index
+    var key = 'reviews.' + i +'.vote'
+    var obj = {}
+    obj[key] = -1
+    console.log(req.body)
+    db.collection('cardinalCourse').findOneAndUpdate(
+        {name: req.body.name},
+        {$inc: obj
+        },
+        {returnOriginal : false, //return the updated document
+         upsert: false}, 
+        (err, result) =>
+        {
+            console.log(result)
             res.send(result);
         })
 })

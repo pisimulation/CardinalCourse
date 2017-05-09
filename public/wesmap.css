@@ -20,3 +20,10 @@
 body {
     background-image: url("symphony.png");
 }
+
+.fa {
+    font-family: inherit
+}
+.fa:hover {
+    color: aquamarine
+}

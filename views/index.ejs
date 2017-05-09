@@ -6,11 +6,13 @@
     
   <link rel="stylesheet" type="text/css" href="wesmap.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="./build/bootstrap-rating-input.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+  
   
 </head>
     
@@ -22,7 +24,7 @@
       - improve design (too much centering?)
     -->
  
-  <div id="search">
+  <div id="search">      
     <h1>CARDINAL COURSE</h1>
     <br>
     <div class="container">    
@@ -78,20 +80,28 @@
                     // find average rating and display that many stars
                     var ratingValue = res[index].rating.stars == 0 ? 0 : Math.round(res[index].rating.stars / res[index].rating.totalVote)
                     
-                    var newItems = JSON.parse(localStorage.getItem('coursesRated'))
-                    
+                    var coursesRated = JSON.parse(localStorage.getItem('coursesRated'))
                     /*
                         check if user has rated
                         if so, make the star rating read-only
                     */
-                    var rated = false;
-                    $.each(newItems, function(i,obj) {
-                      if (obj.courseRated === course.name) { rated = true; return false;}
-                    });
-                    var starInput = rated ?
-                      `<input type="number" id="${index}rating" class="rating" value="${ratingValue}" data-readonly/>` :
-                      `<input type="number" id="${index}rating" class="rating" value="${ratingValue}" />`
-                    
+                    var rated = $.inArray(course.name, coursesRated)
+                    var starInput = rated == -1 ?
+                      `<input type="number" id="${index}rating" class="rating" value="${ratingValue}" />` :
+                      `<input type="number" id="${index}rating" class="rating" value="${ratingValue}" data-readonly/>`
+                    var coursesReviewed = JSON.parse(localStorage.getItem('coursesReviewed'))
+                    var reviewed = $.inArray(course.name, coursesReviewed)
+                    var addReview =
+                        reviewed == -1 ?
+                            `<textarea class="form-control" id="${index}review-txt" rows="3" placeholder="Add your review"></textarea>
+                        <input class="form-control" type="text" placeholder="Name" id="${index}postBy" style='display: inline; width: 30%;'>
+                        <input class="form-control" type="text" placeholder="Professor" id="${index}prof" style='display: inline; width: 29%;'>
+                        <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="${index}sem" style='display: inline; width: 20%;'>
+                        <input class="form-control" type="text" placeholder="Grade (optional)" id="${index}grade" style='display: inline; width: 13%;'>
+                        <button type="submit" class="btn btn-primary" id="${index}submit-btn">Submit</button>
+                        <p id="${index}missingField"></p>`
+                            :
+                            `Thanks for your review!`
                     if(course.reviews.length == 0) {
                         var content =
                             `<li class="list-group-item">
@@ -100,7 +110,7 @@
                               </li>`
                     } else {
                         var content =
-                            course.reviews.map(function(entry) {
+                            course.reviews.map(function(entry,indexReview) {
                               return `
                                       <li class="list-group-item">
                                         <div id="reviews">
@@ -111,6 +121,10 @@
                                         | <b>Semester</b>: ${entry.sem}
                                         | <b>Grade received</b>: ${entry.grade}</p>
                                         </div>
+                                        <span onclick="upvote(\'${course.name}\',${indexReview},${index})"><i class="fa fa-thumbs-up id="upvote"></i></span> &emsp;
+                                        <span id="${indexReview}reviewVote${index}">${entry.vote}</span>
+                                        &emsp;
+                                        <span onclick="downvote(\'${course.name}\',${indexReview},${index})"><i class="fa fa-thumbs-down" id="downvote"></i></span>
                                         </div>
                                         
                                       </li>
@@ -132,15 +146,9 @@
                         ` + content +
                         `
                               </div>
-                        <li class="list-group-item" id="addReview">
-                            <textarea class="form-control" id="${index}review-txt" rows="3" placeholder="Add your review"></textarea>
-                            <input class="form-control" type="text" placeholder="Name" id="${index}postBy" style='display: inline; width: 30%;'>
-                            <input class="form-control" type="text" placeholder="Professor" id="${index}prof" style='display: inline; width: 29%;'>
-                            <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="${index}sem" style='display: inline; width: 20%;'>
-                            <input class="form-control" type="text" placeholder="Grade (optional)" id="${index}grade" style='display: inline; width: 13%;'>
-                            <button type="submit" class="btn btn-primary" id="${index}submit-btn">Submit</button>
-                            <p id="${index}missingField"></p>
-                       </li>
+                        <li class="list-group-item" id="${index}addReview">
+                        ` + addReview +    
+                       `</li>
                             </div>
                         </div>`
                 }).join('');
@@ -178,9 +186,8 @@
                             /*
                                 use local storage to store ratings; prevent user from rating again
                             */
-                            // Create an array to hold the items
                             var items = JSON.parse(localStorage.getItem('coursesRated')) || [];
-                            items.push({courseRated : res[index].name});
+                            items.push(res[index].name);
                             localStorage.setItem('coursesRated', JSON.stringify(items))
                         })
                         
@@ -215,13 +222,11 @@
                               sem: sem,
                               grade: grade
                           })
-                      }).then(res => {
-                          //if(course.reviews.length == 0) {
-                          //  console.log("no reviews")
-                          //  document.getElementById('course-list').innerHTML = ""
-                          //}
-                          document.getElementById(index + 'missingField').innerHTML = "Thanks for your review!"
+                      }).then(resp => {
+                          var indexReview = course.reviews.length
+                          document.getElementById(index + 'addReview').innerHTML = "Thanks for your review!"
                           $('#missingField').val('');
+                          console.log(course.reviews)
                           $('#' + index + 'review-list').append(`
                                 <li class="list-group-item">
                                         <div id="reviews">
@@ -232,10 +237,20 @@
                                         | <b>Semester</b>: ${sem}
                                         | <b>Grade received</b>: ${grade}</p>
                                         </div>
+                                        <span onclick="upvote(\'${course.name}\',${indexReview},${index})"><i class="fa fa-thumbs-up id="upvote"></i></span> &emsp;
+                                        <span id="${indexReview}reviewVote${index}">0</span>
+                                        &emsp;
+                                        <span onclick="downvote(\'${course.name}\',${indexReview},${index})"><i class="fa fa-thumbs-down" id="downvote"></i></span>
                                         </div>
                                 </li>
                           `);
-                          if (res.ok) return res.json();
+                           /*
+                                use local storage to store reviewed courses
+                           */
+                           var items = JSON.parse(localStorage.getItem('coursesReviewed')) || [];
+                           items.push(res[index].name);
+                           localStorage.setItem('coursesReviewed', JSON.stringify(items))
+                          if (resp.ok) return resp.json();
                       })
                     } else {
                         console.log("missing required field(s)")
@@ -245,6 +260,80 @@
             });
         })
         });
+      
+      var upDownVotes = JSON.parse(localStorage.getItem('upDownVotes')) || [];
+      function upvote(coursename,indexReview,index) {
+          var upDown = JSON.parse(localStorage.getItem('upDownVotes'))
+          var upvoted = function() {
+              if (upDown == null) {
+                  return "up"
+              } else {
+                  var search = {};
+                  search[coursename + indexReview] = "down";
+                  var pi = $.inArray(search, upDownVotes)
+                  for (var i = 0 ; i < upDownVotes.length ; i++) {
+                      if (JSON.stringify(upDownVotes[i]) === JSON.stringify(search) ) {
+                          /*
+                            CONTINUE HERE
+                          */
+                          var index = upDownVotes.indexOf(search);
+                          upDownVotes.splice(index, 1);
+                          
+                          return "down"
+                      } else {
+                          alert("NO")
+                      }
+                  }
+                  
+              }
+          }
+          if (upvoted() == "down") {
+              return;
+          }        
+          fetch('upvote', {
+                method: 'put',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name : coursename,
+                    index: indexReview
+                })
+            }).then (resp => {
+                resp.json().then(data => {
+                    var newVote = JSON.parse(data.value.reviews[indexReview].vote)
+                    document.getElementById(indexReview + 'reviewVote' + index).innerHTML = newVote
+                })
+
+            })
+          var newUpVote = {};
+          newUpVote[coursename + indexReview] = "down";
+          upDownVotes.push(newUpVote);
+          localStorage.setItem('upDownVotes', JSON.stringify(upDownVotes));
+      }
+      
+      function downvote(coursename,indexReview,index) {
+          var reviewsDownvoted = JSON.parse(localStorage.getItem('reviewsDownvoted'))
+          var downvoted = $.inArray(coursename + indexReview, reviewsDownvoted)
+          if (downvoted >= 0) {
+              return;
+          }        
+          fetch('downvote', {
+                method: 'put',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name : coursename,
+                    index: indexReview
+                })
+            }).then (resp => {
+                resp.json().then(data => {
+                    var newVote = JSON.parse(data.value.reviews[indexReview].vote)
+                    document.getElementById(indexReview + 'reviewVote' + index).innerHTML = newVote
+                })
+
+            })
+          var items = JSON.parse(localStorage.getItem('reviewsDownvoted')) || [];
+          items.push(coursename + indexReview);
+          localStorage.setItem('reviewsDownvoted', JSON.stringify(items));
+      }
       
   </script>
 

@@ -16,7 +16,7 @@ Then, go to `http://localhost:3000/` in your browser.
 
 ## Features
 
-Users can search courses by department abbreviation (e.g. russ, hist, comp), add their reviews, and rate courses. This project is originally started during the WesHack 2015.
+Users can search courses by department abbreviation (e.g. russ, hist, comp), add their reviews, rate courses, upvote and downvote reviews. This project is originally started during the WesHack 2015.
 
 ## Tool Used
 
@@ -26,9 +26,9 @@ With Scrapy, course names are scraped from [WesMaps 2017-2018](https://iasext.we
 
 `scrapy crawl cs -o cs.json`
 
-### NodeJS, ExpressJS, jQuery
+### NodeJS, ExpressJS, jQuery, local storage
 
-Course reviews are stored in MongoDB database. List of dependencies can be found in package.json
+Course reviews are stored in MongoDB database. List of dependencies can be found in package.json. Local storage is used to store what courses a user has already reviewed or rated and what reviews a user has already upvoted or downvoted.
 
 ### Bootstrap
 
