@@ -1,6 +1,6 @@
 # CardinalCourse
 
-Wesleyan course review site for Wesleyan students to post ratings and reviews of courses they took
+Wesleyan course review site for Wesleyan students to post ratings and share reviews of courses they took. This project was originally started during the WesHack 2015.
 
 ## Installation
 
@@ -16,7 +16,10 @@ Then, go to `http://localhost:3000` in your browser.
 
 ## Features
 
-Users can search courses by department abbreviation (e.g. russ, hist, comp), add their reviews, rate courses, upvote and downvote reviews. This project is originally started during the WesHack 2015.
+* Search for courses by department abbreviation (e.g. russ, hist, comp)
+* Add reviews
+* Rate courses
+* Upvote and downvote reviews
 
 ## Tool Used
 
@@ -32,4 +35,12 @@ Course reviews are stored in MongoDB database. List of dependencies can be found
 
 ### Bootstrap
 
-Bootstrap forms, buttons, collapse divs, etc.
+Bootstrap forms, buttons, collapse divs, navigation bar are used.
+
+## Contribution
+
+Some more features that can be added:
+* User registration system using Wesleyan's username and password
+* Review report and auto deletion
+* MongoDB deployment plan upgrade. The current version is running on a 0.5 GB free plan.
+* Better design
