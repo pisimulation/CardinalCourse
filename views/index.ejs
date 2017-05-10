@@ -12,7 +12,7 @@
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="./build/bootstrap-rating-input.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
-  
+  <link rel="icon" type="image/x-icon" href="letter_w.png" />
   
 </head>
     
@@ -23,10 +23,11 @@
       - improve review box design
       - improve design (too much centering?)
     -->
- 
+<nav class="navbar navbar-default" role="navigation">
+      <a class="navbar-brand" href=".">CARDINAL COURSE <span class="badge">BETA</span></a>
+</nav>
+    
   <div id="search">      
-    <h1>CARDINAL COURSE <span class="badge">BETA</span></h1>
-    <br>
     <div class="container">    
     <div class="input-group">
       <input type="text" class="form-control" id="name-dep-input" placeholder="Enter department abbreviation (e.g. comp, rees, russ, hist)">
@@ -93,8 +94,8 @@
                     var reviewed = $.inArray(course.name, coursesReviewed)
                     var addReview =
                         reviewed == -1 ?
-                            `<textarea class="form-control" id="${index}review-txt" rows="3" placeholder="Add your review"></textarea>
-                        <input class="form-control" type="text" placeholder="Name" id="${index}postBy" style='display: inline; width: 30%;'>
+                            `<textarea class="form-control" id="${index}review-txt" rows="3" placeholder="Share your experience here. How was the course content? Did you learn a lot? How was the professor? Were assignments hard? Would you recommend this course to your friends? "></textarea>
+                        <input class="form-control" type="text" placeholder="Name (can be anything)" id="${index}postBy" style='display: inline; width: 30%;'>
                         <input class="form-control" type="text" placeholder="Professor" id="${index}prof" style='display: inline; width: 29%;'>
                         <input class="form-control" type="text" placeholder="Semester (e.g. spring 2017)" id="${index}sem" style='display: inline; width: 20%;'>
                         <input class="form-control" type="text" placeholder="Grade (optional)" id="${index}grade" style='display: inline; width: 13%;'>
@@ -135,7 +136,7 @@
                             <div class="card-header" role="tab">
                               <h3 class="mb-0">
                                 <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#${index}" aria-expanded="false" aria-controls="collapseOne">
-                                  ${course.name}
+                                  ${course.name} <span class="badge">${course.reviews.length}</span></a>
                                 </a>
                               </h3>
                             <div id="${index}ratingDiv">`+ starInput + `</div>
