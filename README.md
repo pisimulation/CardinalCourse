@@ -37,10 +37,14 @@ Course reviews are stored in MongoDB database. List of dependencies can be found
 
 Bootstrap forms, buttons, collapse divs, navigation bar are used.
 
-## Contribution
+## Contributing
 
 Some more features that can be added:
 * User registration system using Wesleyan's username and password
 * Review report and auto deletion
 * MongoDB deployment plan upgrade. The current version is running on a 0.5 GB free plan.
 * Better design
+
+## Acknowledgments
+
+This project is written as a final project for [the awesome web development forum](https://github.com/Comp420) where I learned full stack web development in 10 weeks. Thank you [Duong Vu](https://github.com/duongvu96) and [Jason Wangsadinata](https://github.com/jwangsadinata) for leading the forum.
